@@ -1,0 +1,48 @@
+class TimeLapse : ZilchComponent
+{
+    [Property]
+    var MaxFrames : Integer = 120;
+    var Frames : Array[Frame] = new Array[Frame]();
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)  
+    {
+        if(Zero.Keyboard.KeyIsDown(Keys.T))
+        {
+            if(this.Frames.All.IsNotEmpty)
+            {
+                this.Owner.Transform.Translation = this.Frames[this.Frames.Count - 1].Position;
+                this.Owner.Transform.EulerAngles = this.Frames[this.Frames.Count - 1].Rotation;
+                this.Frames.Pop();
+            }
+            
+        }
+        else if(this.Frames.Count <= this.MaxFrames)
+            this.Frames.Push(Frame(this.Owner.Transform.Translation, this.Owner.Transform.EulerAngles, 100));
+        else
+            this.Frames.RemoveAt(0);
+    }
+    
+    
+}
+
+struct Frame
+{
+    var Position : Real3 = Real3(0,0,0);
+    var Rotation : Real3 = Real3(0,0,0);
+    var HP : Real = Real(0);
+    constructor (pos : Real3, rot : Real3, heal : Real)
+    {
+        this.Position = pos;
+        this.Rotation = rot;
+        this.HP = heal;
+    }
+    constructor() {}
+
+    destructor()
+    {
+    }
+}

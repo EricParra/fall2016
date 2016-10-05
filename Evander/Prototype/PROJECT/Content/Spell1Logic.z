@@ -1,0 +1,46 @@
+class Spell1Logic : ZilchComponent
+{
+    [Property]
+    var VelocitySpeed : Real = 2;
+    
+    var Epsilon : Real = Real(0.15);
+    
+    var StopChasing : Boolean = false;
+    
+    function Initialize(init : CogInitializer)
+    {
+        this.Space.GlobalVariables.CanSpell1 = false;
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        Zero.Connect(this.Owner, Events.CollisionStarted, this.OnCollisionStarted);
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        var direction = this.Space.FindObjectByName("PrototypePlayer").TargetSelector.TargetPosition - this.Owner.Transform.Translation;
+        var normalizedDirection = Math.Normalize(direction);
+        var distance = Math.Distance(this.Space.FindObjectByName("PrototypePlayer").TargetSelector.TargetPosition, this.Owner.Transform.Translation);
+        
+        if(!this.StopChasing)
+        {
+            if(distance < this.Epsilon)
+                this.StopChasing = true;
+            this.Move(direction, normalizedDirection, distance);  
+        }
+        /*else if(this.Owner.Transform.Translation != this.Space.FindObjectByName("PrototypeEnemy").Transform.Translation)
+            this.Owner.Transform.Translation = this.Space.FindObjectByName("PrototypeEnemy").Transform.Translation;*/
+        
+    }
+    
+    function Move(direction : Real3, normalizedDirection : Real3, distance : Real)
+    {
+        this.Owner.RigidBody.Velocity = (normalizedDirection * this.VelocitySpeed);
+    }
+    
+    function OnCollisionStarted(event : CollisionEvent)
+    {
+        this.Space.GlobalVariables.CanDash = true;
+        this.Owner.SphereCollider.CollisionGroup = CollisionGroup.Null;
+        this.Space.GlobalVariables.CanSpell1 = true;
+        this.Owner.Destroy();
+    }
+}

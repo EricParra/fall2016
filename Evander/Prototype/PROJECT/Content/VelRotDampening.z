@@ -1,0 +1,53 @@
+class VelRotDampening : ZilchComponent
+{
+    [Property]
+    var VelocityDampening : Real = 0.9;
+    
+    [Property]
+    var JumpDampening : Real = 0.9;
+        
+    [Property]
+    var RotationDampening : Real = 0.9;
+    
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        this.VelDampening();
+        this.JumpDamp();
+        this.RotDampening();
+    }
+    
+    function VelDampening()
+    {
+        var vel = this.Owner.RigidBody.Velocity;
+        vel.X *= this.VelocityDampening;
+        this.Owner.RigidBody.Velocity = vel;
+    }
+    function JumpDamp()
+    {
+        var vel = this.Owner.RigidBody.Velocity;
+        vel.Y *= this.JumpDampening;
+        this.Owner.RigidBody.Velocity = vel;
+    }
+    function RotDampening()
+    {
+        var rotvel = this.Owner.RigidBody.AngularVelocity;
+        rotvel.X *= this.RotationDampening;
+        this.Owner.RigidBody.AngularVelocity = rotvel; 
+
+        var r1 = Real(0);
+            
+        var angle = Math.Lerp(this.Owner.Transform.EulerAngles.Y, Math.ToRadians(r1), 0.1);
+        
+        if(this.Owner.Transform.EulerAngles != Real3(0,0,0))    
+            this.Owner.Transform.EulerAngles = Real3(this.Owner.Transform.EulerAngles.X, 
+                                                     angle, 
+                                                     this.Owner.Transform.EulerAngles.Z);
+    }
+    
+}

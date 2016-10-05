@@ -1,0 +1,41 @@
+class TargetSelector : ZilchComponent
+{
+    var NearestEnemyPos : Real3 = Real3(10000,1000,100000);
+    var TargetPosition : Real3 = Real3(0,0,0);
+    var Closestenemy : Cog = null;
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        var enemyarray = this.Space.FindAllObjectsByName("PrototypeEnemy");
+        
+        if(!enemyarray.IsNotEmpty)
+            this.Space.GlobalVariables.NoEnemies = true;
+        else
+            this.Space.GlobalVariables.NoEnemies = false;
+            
+        while (enemyarray.IsNotEmpty)
+        {
+            if(Math.Distance(enemyarray.Current.Transform.Translation, this.Owner.Transform.Translation) < 
+               Math.Distance(this.NearestEnemyPos, this.Owner.Transform.Translation))
+                {
+                    
+                    if(!this.Space.GlobalVariables.CanDash && this.Space.GlobalVariables.CanSpell1)
+                    {
+                        this.NearestEnemyPos = enemyarray.Current.Transform.Translation;
+                        this.Closestenemy = enemyarray.Current; 
+                    }
+                }
+                
+            if(this.Closestenemy != null)
+                this.TargetPosition = this.Closestenemy.Transform.Translation;
+
+            enemyarray.MoveNext();
+        }
+        
+    }
+}

@@ -1,0 +1,89 @@
+class KeyboardController : ZilchComponent
+{
+    var MoveLeft : String = "MoveLeft";
+    var MoveRight : String = "MoveRight";
+    var DashLeft : String = "DashLeft";
+    var DashRight : String = "DashRight";
+    var Jump : String = "Jump";
+    var MoveDown : String = "MoveDown";
+    var Spell1 : String = "Spell1";
+    var Spell1Dash : String = "Spell1Dash";
+    
+    [Property]
+    var Spell1Cooldown : Real = 0.0;
+    
+    var Temp1 : Real;
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        this.Temp1 = this.Spell1Cooldown;
+        this.Spell1Cooldown = 0;
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+
+        var ev  = ZilchEvent();
+        
+        if(Zero.Keyboard.KeyIsDown(Keys.A) && Zero.Keyboard.KeyIsPressed(Keys.Z))
+        {
+            // move left    
+            ev.EventId = this.DashLeft;
+            this.Owner.DispatchEvent(this.DashLeft, ev);
+        }
+        else if(Zero.Keyboard.KeyIsDown(Keys.A))
+        {
+            // move left    
+            ev.EventId = this.MoveLeft;
+            this.Owner.DispatchEvent(this.MoveLeft, ev);
+        }
+        if(Zero.Keyboard.KeyIsDown(Keys.D) && Zero.Keyboard.KeyIsPressed(Keys.Z))
+        {
+            // move right
+            ev.EventId = this.DashRight;
+            this.Owner.DispatchEvent(this.DashRight, ev);
+        }
+        else if(Zero.Keyboard.KeyIsDown(Keys.D))
+        {
+            // move right
+            ev.EventId = this.MoveRight;
+            this.Owner.DispatchEvent(this.MoveRight, ev);
+        }
+        if(Zero.Keyboard.KeyIsPressed(Keys.W))
+        {
+            // move top
+            ev.EventId = this.Jump;
+            this.Owner.DispatchEvent(this.Jump, ev);
+        }
+        if(Zero.Keyboard.KeyIsDown(Keys.S))
+        {
+            // move down
+            ev.EventId = this.MoveDown;
+            this.Owner.DispatchEvent(this.MoveDown, ev);
+        }
+        
+        if(Zero.Keyboard.KeyIsPressed(Keys.Space) && !this.Space.GlobalVariables.NoEnemies && 
+           this.Spell1Cooldown <= 0 && !this.Space.GlobalVariables.CanDash && this.Space.GlobalVariables.CanSpell1)
+        {
+            // move down
+            ev.EventId = this.Spell1;
+            this.Owner.DispatchEvent(this.Spell1, ev);
+            this.Spell1Cooldown = this.Temp1;
+        }
+        else if(Zero.Keyboard.KeyIsPressed(Keys.Space) && !this.Space.GlobalVariables.NoEnemies && 
+                this.Spell1Cooldown <= 0 && this.Space.GlobalVariables.CanDash && this.Space.GlobalVariables.CanSpell1)
+        {
+            // move down
+            ev.EventId = this.Spell1Dash;
+            this.Space.DispatchEvent(this.Spell1Dash, ev);
+        }
+        
+        if(this.Spell1Cooldown > 0)
+        {
+            this.Spell1Cooldown -= event.Dt;
+            this.Spell1Cooldown = Math.Round(this.Spell1Cooldown, -2);
+        }  
+
+    }
+}

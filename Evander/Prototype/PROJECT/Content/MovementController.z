@@ -1,0 +1,119 @@
+class MovementController : ZilchComponent
+{
+    [Property]
+    var MoveSpeed : Real = 10.0;
+    
+    [Property]
+    var DashSpeed : Real = 50;
+    
+    [Property]
+    var JumpSpeed : Real = 10.0;
+    
+    [Property]
+    var RotationSpeed : Real = 2;
+    
+    var CanPlay : Boolean =  true;
+    
+    var Epsilon : Real = Real(2);
+
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        Zero.Connect(this.Owner, "MoveLeft", this.OnKeyboardEvent);
+        Zero.Connect(this.Owner, "MoveRight", this.OnKeyboardEvent);
+        Zero.Connect(this.Owner, "DashLeft", this.OnKeyboardEvent);
+        Zero.Connect(this.Owner, "DashRight", this.OnKeyboardEvent);
+        Zero.Connect(this.Owner, "Jump", this.OnKeyboardEvent);
+        Zero.Connect(this.Owner, "MoveDown", this.OnKeyboardEvent);
+        Zero.Connect(this.Owner, "PlayerDead", this.AllowPlay);
+    }
+    function AllowPlay(event : ZilchEvent)
+    {
+        if(event.EventId == "PlayerDead")
+            this.CanPlay = false;
+    }
+    function OnKeyboardEvent(event : ZilchEvent)
+    {
+        if(this.CanPlay && !this.Space.GlobalVariables.Dashing)
+        {
+            var move : Real3 = Real3(0,0,0);
+        
+            var rotation = Real3(0,0,0);
+            
+            if(event.EventId == "MoveLeft")
+            {
+                //movement
+                move = Real3(-1,0,0) * this.MoveSpeed;
+                //rotation
+                rotation = Real3(-1,0,0) * this.RotationSpeed;      
+                this.Owner.RigidBody.AngularVelocity += rotation;
+            }
+            if(event.EventId == "DashLeft")
+            {
+                //movement
+                move = Real3(-1,0,0) * this.DashSpeed;
+                //rotation
+                rotation = Real3(-1,0,0) * this.RotationSpeed;      
+                this.Owner.RigidBody.AngularVelocity += rotation;
+            }
+            if(event.EventId == "MoveRight")
+            {
+                //movement
+                move = Real3(1,0,0) * this.MoveSpeed;
+                //rotation
+                rotation = Real3(-1,0,0) * this.RotationSpeed;      
+                this.Owner.RigidBody.AngularVelocity += rotation;
+            }
+            if(event.EventId == "DashRight")
+            {
+                //movement
+                move = Real3(1,0,0) * this.DashSpeed;
+                //rotation
+                rotation = Real3(-1,0,0) * this.RotationSpeed;      
+                this.Owner.RigidBody.AngularVelocity += rotation;
+            }
+            if(event.EventId == "Jump")
+            {
+                //movement
+                move = Real3(0,1,0) * this.JumpSpeed;
+                //rotation
+                rotation = Real3(-1,0,0) * this.RotationSpeed;      
+                this.Owner.RigidBody.AngularVelocity += rotation;
+            }
+            
+            if(event.EventId == "MoveDown")
+            {
+                //movement
+                move = Real3(0,-1,0) * this.MoveSpeed;
+                //rotation
+                rotation = Real3(-1,0,0) * this.RotationSpeed;      
+                this.Owner.RigidBody.AngularVelocity += rotation;
+            }
+            
+            //movement
+            this.Owner.RigidBody.Velocity += move;
+        }
+    }
+    
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        if(this.Space.GlobalVariables.Dashing)
+        {
+            var distance = Math.Distance(this.Owner.Transform.Translation, this.Space.FindObjectByName("PrototypePlayer").TargetSelector.TargetPosition); 
+            if(distance > this.Epsilon)
+            {
+                this.Owner.Transform.Translation = Math.Lerp(this.Owner.Transform.Translation, 
+                                                             this.Space.FindObjectByName("PrototypePlayer").TargetSelector.TargetPosition, 
+                                                            0.075);
+            }
+            else
+            {
+                this.Space.GlobalVariables.Dashing = false;
+                this.Space.GlobalVariables.CanDash = false;
+                this.Space.GlobalVariables.Spell1TimeToJump = this.Space.GlobalVariables.Temp;
+            }
+            
+        }
+        
+    }
+}

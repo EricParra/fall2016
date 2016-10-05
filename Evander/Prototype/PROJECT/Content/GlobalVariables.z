@@ -1,0 +1,41 @@
+class GlobalVariables : ZilchComponent
+{
+    var CanDash : Boolean = false;
+    var Dashing : Boolean = false;
+    var CanSpell1 : Boolean = true;
+    var NoEnemies : Boolean = true;
+    var Spell1TimeToJump : Real = 3.0;
+    var Temp : Real;
+    
+    var Temp1 : Real;
+    
+    function Initialize(init : CogInitializer)
+    {
+        this.Temp = this.Spell1TimeToJump;
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        Zero.Connect(this.Owner, "Spell1Dash", this.Spell1Dash);
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        
+        if(this.CanDash)
+        {
+            if(this.Spell1TimeToJump > 0)
+            {
+                this.Spell1TimeToJump -= event.Dt;
+                this.Spell1TimeToJump = Math.Round(this.Spell1TimeToJump, -2);
+            }
+            else
+            {
+                this.Spell1TimeToJump = this.Temp;
+                this.CanDash = false;
+            }
+        }
+    }
+    
+    function Spell1Dash(event : ZilchEvent)
+    {
+        this.Dashing = true;
+    }
+}

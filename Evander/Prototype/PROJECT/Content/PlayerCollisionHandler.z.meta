@@ -1,0 +1,8 @@
+TextContent = 
+{
+	ZilchScriptBuilder = 
+	{
+		string Name = "PlayerCollisionHandler",
+		uint64 ResourceId = 57d94773e91134fb,
+	},
+},

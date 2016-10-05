@@ -1,0 +1,8 @@
+TextContent = 
+{
+	ZilchScriptBuilder = 
+	{
+		string Name = "KeyboardController",
+		uint64 ResourceId = 57c6b05e529d7747,
+	},
+},

@@ -1,0 +1,11 @@
+DataContent = 
+{
+	DataBuilder = 
+	{
+		string Name = "ProtypePhysicsMat",
+		uint64 ResourceId = 57c6bda3b6a5c44c,
+		string LoaderType = "PhysicsMaterial",
+		uint Version = 0,
+		bool ShowInEditor = true,
+	},
+},
