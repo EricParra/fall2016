@@ -3,6 +3,7 @@ class TimeLapse : ZilchComponent
     [Property]
     var MaxFrames : Integer = 120;
     var Frames : Array[Frame] = new Array[Frame]();
+    var  TimeLim: Real = 120;
     function Initialize(init : CogInitializer)
     {
         Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
@@ -12,11 +13,12 @@ class TimeLapse : ZilchComponent
     {
         if(Zero.Keyboard.KeyIsDown(Keys.T))
         {
-            if(this.Frames.All.IsNotEmpty)
+            if(this.Frames.All.IsNotEmpty && this.TimeLim != 0)
             {
                 this.Owner.Transform.Translation = this.Frames[this.Frames.Count - 1].Position;
                 this.Owner.Transform.EulerAngles = this.Frames[this.Frames.Count - 1].Rotation;
                 this.Frames.Pop();
+                this.TimeLim -= 1;
             }
             
         }

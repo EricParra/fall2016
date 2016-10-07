@@ -1,0 +1,27 @@
+class TimeBar : ZilchComponent
+{
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        var timeLim : Real = this.Space.FindObjectByName("PrototypePlayer").TimeLapse.TimeLim;
+        var scale: Real = (timeLim/ 120);
+        var counter: Real = 120;
+        var timePos : Real = ((5.97 * (0.69 - (0.69 * scale))) );
+        //var timeBar: Real = this.Space.Camera.TimeBar.Transform.Translation.X;
+        
+        if (timeLim != counter)
+        {
+            // 0.69 is the value of the Scale.X
+            this.Owner.Transform.Scale = Real3(0.69 * scale, this.Owner.Transform.Scale.Y, 1); 
+            // -11.35 is the value of the Translation.X
+            //this.Owner.Transform.Translation = Real3((timeBar - timePos), 
+                                                    //this.Owner.Transform.Translation.Y, 1) ;
+            Console.WriteLine("`this.Owner.Transform.Translation`");
+            counter -= 1;
+        }
+    }
+}
